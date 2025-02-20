@@ -15,6 +15,16 @@ class BrentDataAnalysis:
         print("✅ Data loaded successfully!")
         return self.df.head()
 
+    def overview_of_data(self):
+        """Provide an overview of the dataset."""
+        print("Overview of the Data:")
+        print(f"Number of Rows: {self.data.shape[0]}")
+        print(f"Number of Columns: {self.data.shape[1]}")
+        print("\nData Types:")
+        print(self.data.dtypes)
+        print("\nFirst 5 Rows:")
+        print(self.data.head())
+
     def describe_data(self):
         """Provide basic summary statistics"""
         print(f"Basic statistical summary for numerical columns\n {self.data.describe()}")
