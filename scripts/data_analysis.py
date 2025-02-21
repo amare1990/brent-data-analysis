@@ -64,6 +64,12 @@ class BrentDataAnalysis:
         print(f"Total rows left after duplicate rows removed. \n {self.data.shape[0]}")
         print("\n")
 
+    def save_processed_data(self, save_path):
+       """Saving processed data."""
+       self.data.to_csv(save_path)
+       print(f"Processed data saved successfully as {save_path}")
+
+
     def plot_time_series(self):
         """Plot time series data."""
         print(f"\n{'*'*70}\n")
