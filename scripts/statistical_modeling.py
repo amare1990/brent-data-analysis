@@ -1,5 +1,7 @@
 """Statistical modeling."""
 
+import matplotlib.pyplot as plt
+
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.arima_model import ARIMA
 from arch import arch_model
@@ -16,6 +18,20 @@ class StatisticalModel:
     def check_stationarity(self):
         result = adfuller(self.data['Price'])
         return {'ADF Statistic': result[0], 'p-value': result[1]}
+
+    def plot_acf_pacf(self, lags=30):
+        """Plot ACF and PACF to determine AR and MA orders."""
+        fig, ax = plt.subplots(1, 2, figsize=(14, 5))
+
+        # Plot ACF (AutoCorrelation Function)
+        plot_acf(self.data['Price'], lags=lags, ax=ax[0])
+        ax[0].set_title("Autocorrelation Function (ACF)")
+
+        # Plot PACF (Partial AutoCorrelation Function)
+        plot_pacf(self.data['Price'], lags=lags, ax=ax[1])
+        ax[1].set_title("Partial Autocorrelation Function (PACF)")
+
+        plt.show()
 
     def fit_arima(self, order=(1,1,1)):
         """Fit an ARIMA model"""
