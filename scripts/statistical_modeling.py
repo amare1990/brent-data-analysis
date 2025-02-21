@@ -24,3 +24,13 @@ class StatisticalModel:
         garch = arch_model(self.data['Price'], vol='Garch', p=1, q=1)
         self.garch_result = garch.fit()
         print(self.garch_result.summary())
+
+    def bayesian_inference(self):
+        """Perform Bayesian analysis using PyMC3"""
+        import pymc3 as pm
+        with pm.Model() as model:
+            sigma = pm.Exponential("sigma", 1.0)
+            mu = pm.Normal("mu", mu=self.data['Price'].mean(), sigma=10)
+            likelihood = pm.Normal("obs", mu=mu, sigma=sigma, observed=self.data['Price'])
+            trace = pm.sample(1000, return_inferencedata=True)
+        return trace
