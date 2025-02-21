@@ -1,6 +1,7 @@
 """Data Analysis Workflow."""
 
-import os, sys
+import os
+import sys
 
 import pandas as pd
 
@@ -20,9 +21,12 @@ class BrentDataAnalysis:
 
     def load_data(self):
         """Load Brent oil price dataset"""
-        self.data = pd.read_csv(self.file_path, parse_dates=["Date"], index_col="Date")
+        self.data = pd.read_csv(
+            self.file_path,
+            parse_dates=["Date"],
+            index_col="Date")
         print(f"\n{'*'*70}")
-        print("✅ Data loaded successfully!")
+        print("Data loaded successfully!")
         return self.data
 
     def overview_of_data(self):
@@ -39,11 +43,13 @@ class BrentDataAnalysis:
     def describe_data(self):
         """Provide basic summary statistics"""
         print(f"\n{'*'*70}")
-        print(f"Basic statistical summary for numerical columns\n {self.data.describe()}")
+        print(
+            f"Basic statistical summary for numerical columns\n {self.data.describe()}")
         if self.data.dtypes[self.data.dtypes == "object"].any():
-          print(f"\nBasic statistical summary for categorical columns\n {self.data.describe(include=[object, 'category'])}")
+            print(
+                f"\nBasic statistical summary for categorical columns\n {self.data.describe(include=[object, 'category'])}")
         else:
-          print("No categorical or object columns found.")
+            print("No categorical or object columns found.")
 
     def identify_missing_values(self):
         """Identify missing values in the dataset."""
@@ -60,15 +66,16 @@ class BrentDataAnalysis:
         rows_after = self.data.shape[0]
         print(f"\n{'*'*70}")
         print("Duplicates removed.")
-        print(f"Number of rows removed for the duplicate rows case: {rows_before - rows_after}")
-        print(f"Total rows left after duplicate rows removed. \n {self.data.shape[0]}")
+        print(
+            f"Number of rows removed for the duplicate rows case: {rows_before - rows_after}")
+        print(
+            f"Total rows left after duplicate rows removed. \n {self.data.shape[0]}")
         print("\n")
 
     def save_processed_data(self, save_path):
-       """Saving processed data."""
-       self.data.to_csv(save_path)
-       print(f"Processed data saved successfully as {save_path}")
-
+        """Saving processed data."""
+        self.data.to_csv(save_path)
+        print(f"Processed data saved successfully as {save_path}")
 
     def plot_time_series(self):
         """Plot time series data."""
@@ -82,17 +89,16 @@ class BrentDataAnalysis:
         plt.tight_layout()
 
         if os.path.exists(base_dir):
-          print(f"{base_dir}/notebooks/plots path exists already!")
+            print(f"{base_dir}/notebooks/plots path exists already!")
         else:
-          print(f"New {base_dir}/notebooks/plots is being created!")
-          os.makedirs(base_dir)
+            print(f"New {base_dir}/notebooks/plots is being created!")
+            os.makedirs(base_dir)
 
         plt.savefig(
             f'{base_dir}/notebooks/plots/ctime_series_plot.png',
             dpi=300,
             bbox_inches='tight'
         )
-        print(f"Plot saved successfully as {base_dir}/notebooks/plots/ctime_series_plot.png")
+        print(
+            f"Plot saved successfully as {base_dir}/notebooks/plots/ctime_series_plot.png")
         plt.show()
-
-

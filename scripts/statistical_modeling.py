@@ -12,11 +12,9 @@ import pymc as pm
 base_dir = "/home/am/Documents/Software Development/10_Academy Training/week-10/brent-data-analysis"
 
 
-
 class StatisticalModel:
     def __init__(self, data):
         self.data = data
-
 
     def check_stationarity(self):
         print(f"\n{'*'*70}\n")
@@ -35,7 +33,6 @@ class StatisticalModel:
         ax[0].set_title("Autocorrelation Function (ACF)")
         ax[0].axhline(y=0, linestyle='--', color='gray')
 
-
         # Plot PACF (Partial AutoCorrelation Function)
         plot_pacf(self.data['Price'], lags=lags, ax=ax[1])
         ax[1].set_title("Partial Autocorrelation Function (PACF)")
@@ -45,11 +42,11 @@ class StatisticalModel:
             f'{base_dir}/notebooks/plots/acf_pacf_plot.png',
             dpi=300,
             bbox_inches='tight'
-            )
+        )
 
         plt.show()
 
-    def fit_arima(self, order=(1,1,1)):
+    def fit_arima(self, order=(1, 1, 1)):
         """Fit an ARIMA model"""
         print(f"\n{'*'*70}\n")
         print("Fitting ARIMA model.\n")
@@ -73,7 +70,8 @@ class StatisticalModel:
         with pm.Model() as model:
             sigma = pm.Exponential("sigma", 1.0)
             mu = pm.Normal("mu", mu=self.data['Price'].mean(), sigma=10)
-            likelihood = pm.Normal("obs", mu=mu, sigma=sigma, observed=self.data['Price'])
+            likelihood = pm.Normal(
+                "obs", mu=mu, sigma=sigma, observed=self.data['Price'])
             trace = pm.sample(1000, return_inferencedata=True)
 
         print("Performing Bayesian analysis using PYMC completed!")
@@ -82,7 +80,8 @@ class StatisticalModel:
         print(f"\n{'-'*70}\n")
         print("\nPosterior Summary:")
         print(trace.posterior)  # Prints the raw posterior samples
-        print(pm.summary(trace))  # Prints a statistical summary (mean, std, etc.)
+        # Prints a statistical summary (mean, std, etc.)
+        print(pm.summary(trace))
 
         # Print sample statistics
         print(f"\n{'-'*70}\n")
