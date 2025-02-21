@@ -1,9 +1,14 @@
 """Data Analysis Workflow."""
 
+import os, sys
+
 import pandas as pd
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+
+base_dir = "/home/am/Documents/Software Development/10_Academy Training/week-10/brent-data-analysis"
 
 
 class BrentDataAnalysis:
@@ -61,7 +66,7 @@ class BrentDataAnalysis:
 
     def plot_time_series(self):
         """Plot time series data."""
-        print(f"\n{'*'*70}")
+        print(f"\n{'*'*70}\n")
         plt.figure(figsize=(12, 6))
         sns.lineplot(data=self.data, x=self.data.index, y='Price')
         plt.title('Brent Oil Price Time Series')
@@ -69,7 +74,19 @@ class BrentDataAnalysis:
         plt.ylabel('Price')
         plt.xticks(rotation=45)
         plt.tight_layout()
-        plt.savefig('../notebooks/plots/ctime_series_plot.png')
+
+        if os.path.exists(base_dir):
+          print(f"{base_dir}/notebooks/plots path exists already!")
+        else:
+          print(f"New {base_dir}/notebooks/plots is being created!")
+          os.makedirs(base_dir)
+
+        plt.savefig(
+            f'{base_dir}/notebooks/plots/ctime_series_plot.png',
+            dpi=300,
+            bbox_inches='tight'
+        )
+        print(f"Plot saved successfully as {base_dir}/notebooks/plots/ctime_series_plot.png")
         plt.show()
 
 
