@@ -14,17 +14,16 @@
 
 
 ---
-
 ## Project Structure
-
-brent-data-analysis/
+```bash
+brent-data-analysis\
 │── .github/workflows/              # GitHub Actions for CI/CD
-│   ├── pylint.yml
-│── data/                          # Directory for datasets
+│   ├── pylint.yml                 # Workflow for checking Python code styles
+│── data\                          # Directory for datasets
 │   ├── BrentOilPrices.csv         # Raw dataset
 │   ├── processed_data.csv         # Processed dataset (after cleaning)
 │
-│── notebooks/                      # Jupyter notebooks for analysis
+│── notebooks\                     # Jupyter notebooks for analysis
 │   ├── data_analyzer.ipynb         # Notebook for data analysis
 │   ├── statistical_modeling.ipynb  # Notebook for statistical modeling
 │   ├── plots/                      # Directory for storing generated plots
@@ -32,22 +31,21 @@ brent-data-analysis/
 │       ├── acf_pacf_plot.png       # ACF and PACF plot
 │
 │── scripts/                        # Python scripts for different modules
-    ├── __init__.py     # Statistical modeling (ARIMA, GARCH, Bayesian)
+    ├── __init__.py
 │   ├── data_analysis.py            # Data cleaning, analysis, and EDA
 │   ├── statistical_modeling.py     # Statistical modeling (ARIMA, GARCH, Bayesian)
-
 │
 │── src/                            # Main automation script
     ├── __init__.py
 │   ├── src.py                      # Main pipeline script
 │
-│── tests/              # Folder test files
+│── tests              # Folder that contain testing scripts
 │   ├── __init__.py
 │
 │── requirements.txt                 # Dependencies and libraries
 │── README.md                        # Project documentation
 │── .gitignore                        # Files and directories to ignore in Git
-
+```
 
 ---
 
