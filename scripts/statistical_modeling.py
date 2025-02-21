@@ -17,3 +17,10 @@ class StatisticalModel:
         model = ARIMA(self.data['Price'], order=order)
         self.arima_result = model.fit()
         print(self.arima_result.summary())
+
+    def fit_garch(self):
+        """Fit a GARCH model"""
+        from arch import arch_model
+        garch = arch_model(self.data['Price'], vol='Garch', p=1, q=1)
+        self.garch_result = garch.fit()
+        print(self.garch_result.summary())
