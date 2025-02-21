@@ -12,6 +12,11 @@ class StatisticalModel:
     def __init__(self, data):
         self.data = data
 
+
+    def check_stationarity(self):
+        result = adfuller(self.data['Price'])
+        return {'ADF Statistic': result[0], 'p-value': result[1]}
+
     def fit_arima(self, order=(1,1,1)):
         """Fit an ARIMA model"""
         model = ARIMA(self.data['Price'], order=order)
