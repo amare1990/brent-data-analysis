@@ -59,7 +59,7 @@ class StatisticalModel:
         """Fit a GARCH model"""
         print(f"\n{'*'*70}\n")
         print("Fitting GARCH model.\n")
-        garch = arch_model(self.data['Price'], vol='Garch', p=1, q=1)
+        garch = arch_model(self.data['Price'].pct_change().dropna(), vol='Garch', p=1, q=1)
         self.garch_result = garch.fit()
         print(self.garch_result.summary())
 
