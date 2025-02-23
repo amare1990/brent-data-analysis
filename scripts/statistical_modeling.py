@@ -10,6 +10,7 @@ from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.arima.model import ARIMA
 from arch import arch_model
 from statsmodels.tsa.api import VAR
+from statsmodels.tsa.regime_switching import MarkovRegression
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import pymc as pm
 import arviz as az
@@ -216,6 +217,20 @@ class StatisticalModel:
 
         print(var_result.summary())
         return var_result
+
+
+    def fit_markov_switching_arima(self, order=(1, 1, 1), n_regimes=2):
+        """Fit a Markov-Switching ARIMA model."""
+        print(f"\n{'*'*70}\n")
+        print("Fitting Markov-Switching ARIMA model.\n")
+
+        # Fit the Markov-Switching ARIMA model
+        model = MarkovRegression(self.data['Price'], k_regimes=n_regimes, order=order)
+        result = model.fit()
+
+        print(result.summary())
+        return result
+
 
 
 
