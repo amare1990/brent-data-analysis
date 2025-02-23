@@ -33,8 +33,9 @@ if __name__ == "__main__":
     workflow.describe_data()
     workflow.identify_missing_values()
     workflow.remove_duplicates()
-    workflow.save_processed_data(save_path)
+    workflow.sort_data()
     workflow.plot_time_series()
+    workflow.save_processed_data(save_path)
 
     # Run the pipeline processes for the statistical data modeling modules
     processed_data_path = f"{base_dir}/data/processed_data.csv"
