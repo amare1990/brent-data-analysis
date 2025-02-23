@@ -53,5 +53,10 @@ if __name__ == "__main__":
     statistical_model.fit_garch()
 
     trace = statistical_model.bayesian_inference()
+    var_result = statistical_model.fit_var()
+    markov_switching_result = statistical_model.fit_markov_switching_arima()
+
+    lstm_model, perf_metrics = statistical_model.fit_lstm(epochs=10, batch_size=32)
+
 
     statistical_model.compare_models()
