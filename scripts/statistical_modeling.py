@@ -208,8 +208,8 @@ class StatisticalModel:
 
 
     def fit_var(self, lags=5):
-        """Fit a Vector Autoregressive (VAR) model."""
-        print(f"\n{'*'*70}\n")
+        """Fit a Vector Autoregressive (VAR) model with predictions and performance metrics."""
+        print(f"\n{'*'*100}\n")
         print("Fitting VAR model.\n")
 
         # Ensure that the data used for VAR is stationary
@@ -217,12 +217,35 @@ class StatisticalModel:
         var_model = VAR(var_data)
         var_result = var_model.fit(lags)
 
+        # Forecast
+        var_preds = var_result.forecast(var_data.values[-lags:], steps=len(self.test))
+
+        # Compute Metrics
+        var_rmse = np.sqrt(mean_squared_error(self.test['Price'], var_preds[:, 0]))  # Assuming 'Price' is the first column
+        var_mae = mean_absolute_error(self.test['Price'], var_preds[:, 0])
+        var_r2 = r2_score(self.test['Price'], var_preds[:, 0])
+
+        print(f"📊 VAR Performance:")
+        print(f"✅ RMSE: {var_rmse}")
+        print(f"✅ MAE: {var_mae}")
+        print(f"✅ R² Score: {var_r2}")
+
+        # Plot
+        plt.figure(figsize=(10, 5))
+        plt.plot(self.test.index, self.test['Price'], label="Actual Price")
+        plt.plot(self.test.index, var_preds[:, 0], linestyle="dashed", label="Predicted Price (VAR)")
+        plt.legend()
+        plt.title("VAR Predictions vs Actual")
+        plt.savefig(f"{base_dir}/notebooks/plots/var_prediction.png", dpi=300, bbox_inches="tight")
+        plt.show()
+
         print(var_result.summary())
         return var_result
 
 
+
     def fit_markov_switching_arima(self, order=(1, 1, 1), n_regimes=2):
-        """Fit a Markov-Switching ARIMA model."""
+        """Fit a Markov-Switching ARIMA model with predictions and performance metrics."""
         print(f"\n{'*'*70}\n")
         print("Fitting Markov-Switching ARIMA model.\n")
 
@@ -230,9 +253,38 @@ class StatisticalModel:
         model = MarkovRegression(self.data['Price'], k_regimes=n_regimes, order=order)
         result = model.fit()
 
+        # Forecast
+        markov_preds = result.predict(start=self.test.index[0], end=self.test.index[-1])
+
+        # Compute Metrics
+        markov_rmse = np.sqrt(mean_squared_error(self.test['Price'], markov_preds))
+        markov_mae = mean_absolute_error(self.test['Price'], markov_preds)
+        markov_r2 = r2_score(self.test['Price'], markov_preds)
+
+        print(f"📊 Markov-Switching ARIMA Performance:")
+        print(f"✅ RMSE: {markov_rmse}")
+        print(f"✅ MAE: {markov_mae}")
+        print(f"✅ R² Score: {markov_r2}")
+
+        # Plot
+        plt.figure(figsize=(10, 5))
+        plt.plot(self.test.index, self.test['Price'], label="Actual Price")
+        plt.plot(self.test.index, markov_preds, linestyle="dashed", label="Predicted Price (Markov-Switching ARIMA)")
+        plt.legend()
+        plt.title("Markov-Switching ARIMA Predictions vs Actual")
+        plt.savefig(f"{base_dir}/notebooks/plots/markov_switching_arima_prediction.png", dpi=300, bbox_inches="tight")
+        plt.show()
+
         print(result.summary())
         return result
 
+
+    def fit_lstm(self, epochs=100, batch_size=32):
+        """Fit an LSTM model for time series forecasting."""
+        print(f"\n{'*'*100}\n")
+        print("Fitting LSTM model.\n")
+        lstm_model = LSTMModel(data=self.data)
+        return lstm_model.fit_lstm(epochs=epochs, batch_size=batch_size)
 
 
 
@@ -273,12 +325,41 @@ class StatisticalModel:
         garch_mae = mean_absolute_error(actual_volatility, garch_preds)
         garch_r2 = r2_score(actual_volatility, garch_preds)
 
+        # --------------------- VAR Model Evaluation ---------------------
+        # Assuming fit_var returns the predicted values for the test set
+        var_preds = self.fit_var()  # Adjust based on your implementation
+        var_rmse = np.sqrt(mean_squared_error(self.test['Price'], var_preds))
+        var_mae = mean_absolute_error(self.test['Price'], var_preds)
+        var_r2 = r2_score(self.test['Price'], var_preds)
+
+        # --------------------- Markov-Switching ARIMA Model Evaluation ---------------------
+        # Assuming fit_markov_switching_arima returns the predicted values for the test set
+        msarima_preds = self.fit_markov_switching_arima()  # Adjust based on your implementation
+        msarima_rmse = np.sqrt(mean_squared_error(self.test['Price'], msarima_preds))
+        msarima_mae = mean_absolute_error(self.test['Price'], msarima_preds)
+        msarima_r2 = r2_score(self.test['Price'], msarima_preds)
+
+
+        # --------------------- LSTM Model Evaluation ---------------------
+        data = pd.read_csv("../data/processed_data.csv")
+        lstm_model = LSTMModel(data=data)
+        # lstm_model = lstm_model.fit_lstm(epochs=100, batch_size=32)  # Ensure to adjust parameters
+        # Step 3: Call fit_lstm method to train the model
+        trained_model = lstm_model.fit_lstm(epochs=100, batch_size=32)  # Adjust epochs and batch_size
+
+
+
+        lstm_preds = self.test['Price']  # Replace with actual LSTM predictions
+        lstm_rmse = np.sqrt(mean_squared_error(self.test['Price'], lstm_preds))
+        lstm_mae = mean_absolute_error(self.test['Price'], lstm_preds)
+        lstm_r2 = r2_score(self.test['Price'], lstm_preds)
+
         # --------------------- Print Model Comparison ---------------------
         metrics = pd.DataFrame({
-            "Model": ["ARIMA", "GARCH", "Bayesian Inference"],
-            "RMSE": [arima_rmse, garch_rmse, bayesian_rmse],
-            "MAE": [arima_mae, garch_mae, bayesian_mae],
-            "R² Score": [arima_r2, garch_r2, bayesian_r2]
+            "Model": ["ARIMA", "GARCH", "Bayesian Inference", "VAR", "Markov-Switching ARIMA", "LSTM"],
+            "RMSE": [arima_rmse, garch_rmse, bayesian_rmse, var_rmse, msarima_rmse, lstm_rmse],
+            "MAE": [arima_mae, garch_mae, bayesian_mae, var_mae, msarima_mae, lstm_mae],
+            "R² Score": [arima_r2, garch_r2, bayesian_r2, var_r2, msarima_r2, lstm_r2]
         })
 
         print(metrics)
