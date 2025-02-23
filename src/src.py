@@ -53,3 +53,5 @@ if __name__ == "__main__":
     statistical_model.fit_garch()
 
     trace = statistical_model.bayesian_inference()
+
+    statistical_model.compare_models()
