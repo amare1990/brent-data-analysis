@@ -17,6 +17,8 @@ import arviz as az
 
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
+from scripts.lstm import LSTMModel
+
 
 base_dir = "/home/am/Documents/Software Development/10_Academy Training/week-10/brent-data-analysis"
 
