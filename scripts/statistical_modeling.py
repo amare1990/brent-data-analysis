@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.arima.model import ARIMA
 from arch import arch_model
+from statsmodels.tsa.api import VAR
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import pymc as pm
 import arviz as az
@@ -201,6 +202,21 @@ class StatisticalModel:
         print(trace.observed_data)
 
         return trace
+
+
+    def fit_var(self, lags=5):
+        """Fit a Vector Autoregressive (VAR) model."""
+        print(f"\n{'*'*70}\n")
+        print("Fitting VAR model.\n")
+
+        # Ensure that the data used for VAR is stationary
+        var_data = self.data[['Price', 'OtherFeature']]  # Add more features as needed
+        var_model = VAR(var_data)
+        var_result = var_model.fit(lags)
+
+        print(var_result.summary())
+        return var_result
+
 
 
     def compare_models(self):
