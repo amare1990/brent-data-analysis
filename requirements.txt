@@ -67,6 +67,7 @@ jupyterlab_pygments==0.3.0
 jupyterlab_server==2.27.3
 kiwisolver==1.4.7
 logical-unification==0.4.6
+lxml==5.3.1
 MarkupSafe==2.1.5
 matplotlib==3.7.5
 matplotlib-inline==0.1.7
@@ -99,6 +100,7 @@ nvidia-nvtx-cu12==12.1.105
 overrides==7.7.0
 packaging==24.2
 pandas==2.0.3
+pandas-datareader==0.10.0
 pandocfilters==1.5.1
 parso==0.8.4
 patsy==1.0.1
