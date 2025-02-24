@@ -49,3 +49,14 @@ class ChangePointAnalysis:
             print("GPR data downloaded successfully!")
         except Exception as e:
             print(f"Error downloading GPR data: {e}")
+
+
+    def merge_data(self):
+        # Merge all downloaded data with the historical data
+        self.merged_data = self.data.merge(self.gdp, left_index=True, right_index=True, how='left')
+        self.merged_data = self.merged_data.merge(self.inflation, left_index=True, right_index=True, how='left')
+        self.merged_data = self.merged_data.merge(self.usd_rate, left_index=True, right_index=True, how='left')
+        self.merged_data = self.merged_data.merge(self.gpr, left_index=True, right_index=True, how='left')
+
+        # Drop any rows with missing values after merging
+        self.merged_data.dropna(inplace=True)
