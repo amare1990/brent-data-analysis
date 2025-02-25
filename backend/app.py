@@ -63,18 +63,6 @@ def compare_models():
     print(f"\n{'*'*100}\n")
     print("Comparing Model Performance\n")
 
-    statistical_model.fit_arima()
-
-    statistical_model.fit_garch()
-
-    trace = statistical_model.bayesian_inference()
-
-    # var_result = statistical_model.fit_var()
-    # markov_switching_result = statistical_model.fit_markov_switching_arima()
-
-    lstm_model, perf_metrics = statistical_model.fit_lstm(
-        epochs=10, batch_size=32)
-
     # --------------------- ARIMA Model Evaluation ---------------------
     arima_preds = statistical_model.arima_result.forecast(steps=len(statistical_model.test))
     arima_rmse = np.sqrt(
