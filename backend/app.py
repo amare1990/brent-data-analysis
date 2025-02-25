@@ -13,6 +13,8 @@ sys.path.append(BASE_DIR)
 from scripts.data_analysis import BrentDataAnalysis
 from scripts.statistical_modeling import StatisticalModel
 
+from scripts.lstm import LSTMTimeSeries
+
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -40,10 +42,12 @@ def get_data():
     return workflow.data.to_json()
 
 
-@app.route("api/describe", methods=["GET"])
+@app.route("/api/describe", methods=["GET"])
 def describe_data():
     """Statistical description of data"""
-    return workflow.data.describe().to_json()
+    # return jsonify({"statistical summary": str(workflow.data.describe())})
+    return jsonify(workflow.data.describe().to_dict())
+
 
 
 @app.route("/api/arima", methods=["GET"])
@@ -56,44 +60,95 @@ def get_arima_results():
 def compare_models():
     """Compare model performance using RMSE, MAE, and R² Score."""
 
-    # Dummy test data and model results for the sake of example
-    # Replace this part with your actual models' predictions
-    test = pd.DataFrame({'Price': np.random.randn(100)})
-    train = pd.DataFrame({'Price': np.random.randn(100)})
+    print(f"\n{'*'*100}\n")
+    print("Comparing Model Performance\n")
 
-    # ARIMA Model
-    arima_preds = np.random.randn(len(test))
-    arima_rmse = np.sqrt(mean_squared_error(test['Price'], arima_preds))
-    arima_mae = mean_absolute_error(test['Price'], arima_preds)
-    arima_r2 = r2_score(test['Price'], arima_preds)
+    statistical_model.fit_arima()
 
-    # Bayesian Inference Model
-    bayes_preds = [train['Price'].mean()] * len(test)
-    bayesian_rmse = np.sqrt(mean_squared_error(test['Price'], bayes_preds))
-    bayesian_mae = mean_absolute_error(test['Price'], bayes_preds)
-    bayesian_r2 = r2_score(test['Price'], bayes_preds)
+    statistical_model.fit_garch()
 
-    # GARCH Model
-    garch_preds = np.random.randn(len(test))
-    garch_rmse = np.sqrt(mean_squared_error(test['Price'], garch_preds))
-    garch_mae = mean_absolute_error(test['Price'], garch_preds)
-    garch_r2 = r2_score(test['Price'], garch_preds)
+    trace = statistical_model.bayesian_inference()
 
-    # LSTM Model
-    lstm_rmse = np.random.rand()
-    lstm_mae = np.random.rand()
-    lstm_r2 = np.random.rand()
+    # var_result = statistical_model.fit_var()
+    # markov_switching_result = statistical_model.fit_markov_switching_arima()
 
-    # Prepare the metrics data for frontend
-    metrics = [
-        {"model": "ARIMA", "rmse": arima_rmse, "mae": arima_mae, "r2": arima_r2},
-        {"model": "Bayesian Inference", "rmse": bayesian_rmse, "mae": bayesian_mae, "r2": bayesian_r2},
-        {"model": "GARCH", "rmse": garch_rmse, "mae": garch_mae, "r2": garch_r2},
-        {"model": "LSTM", "rmse": lstm_rmse, "mae": lstm_mae, "r2": lstm_r2},
-    ]
+    lstm_model, perf_metrics = statistical_model.fit_lstm(
+        epochs=10, batch_size=32)
 
-    return jsonify(metrics)
+    # --------------------- ARIMA Model Evaluation ---------------------
+    arima_preds = statistical_model.arima_result.forecast(steps=len(statistical_model.test))
+    arima_rmse = np.sqrt(
+        mean_squared_error(
+            statistical_model.test['Price'],
+            arima_preds))
+    arima_mae = mean_absolute_error(statistical_model.test['Price'], arima_preds)
+    arima_r2 = r2_score(statistical_model.test['Price'], arima_preds)
 
-if __name__ == "__main__":
+    # --------------------- Bayesian Inference Evaluation -----------------
+    bayes_preds = [statistical_model.train['Price'].mean()] * len(statistical_model.test)
+    bayesian_rmse = np.sqrt(
+        mean_squared_error(
+            statistical_model.test['Price'],
+            bayes_preds))
+    bayesian_mae = mean_absolute_error(statistical_model.test['Price'], bayes_preds)
+    bayesian_r2 = r2_score(statistical_model.test['Price'], bayes_preds)
+
+    # --------------------- GARCH Model Evaluation ---------------------
+    # Squared returns
+    actual_volatility = statistical_model.test['Price'].pct_change() ** 2
+    garch_forecast = statistical_model.garch_result.forecast(
+        start=len(statistical_model.train) - len(statistical_model.test),
+        horizon=len(statistical_model.test)
+    )
+    # Predicted volatility
+    garch_preds = garch_forecast.variance.values[-1, :]
+
+    min_len = min(len(actual_volatility.dropna()), len(garch_preds))
+    actual_volatility = actual_volatility.dropna()[:min_len]
+    garch_preds = garch_preds[:min_len]
+
+    garch_rmse = np.sqrt(
+        mean_squared_error(
+            actual_volatility,
+            garch_preds))
+    garch_mae = mean_absolute_error(actual_volatility, garch_preds)
+    garch_r2 = r2_score(actual_volatility, garch_preds)
+
+    # --------------------- LSTM Model Evaluation ---------------------
+    lstm_model = LSTMTimeSeries(data=statistical_model.data, epochs=10, batch_size=32)
+
+    lstm_model, perf_metrics = lstm_model.fit()
+    lstm_rmse = perf_metrics['rmse']
+    lstm_mae = perf_metrics['mae']
+    lstm_r2 = perf_metrics['r2']
+    print(f"LSTM Performance Metrics:")
+    print(f"RMSE: {perf_metrics['rmse']}")
+    print(f"MAE: {perf_metrics['mae']}")
+    print(f"R² Score: {perf_metrics['r2']}")
+
+    # --------------------- Print Model Comparison ---------------------
+    metrics = pd.DataFrame({
+        "Model": ["ARIMA", "GARCH", "Bayesian Inference", "LSTM"],
+        "RMSE": [arima_rmse, garch_rmse, bayesian_rmse, lstm_rmse],
+        "MAE": [arima_mae, garch_mae, bayesian_mae, lstm_mae],
+        "R² Score": [arima_r2, garch_r2, bayesian_r2, lstm_r2]
+    })
+
+    # Print the API response to debug
+    print(metrics.to_string(index=False))
+
+    response_data = metrics.to_dict(orient="records")
+    print("Sending JSON response:", response_data)
+
+
+
+    print(f"\n{'-'*100}\n")
+    print("✅ Model with lowest RMSE and MAE is generally the best.")
+    print("✅ Higher R² Score (closer to 1) indicates better model fit.\n")
+
+    # Return the metrics as JSON
+    return jsonify(response_data)
+
+if __name__ =="__main__":
     app.run(debug=True)
 

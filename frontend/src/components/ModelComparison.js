@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { fetchModelComparison } from "../services/api";
 import './ModelComparison.css';  // CSS for styling
 
 const ModelComparison = () => {
   const [metrics, setMetrics] = useState([]);
 
   useEffect(() => {
-    // Fetch model comparison data from Flask backend
-    axios.get('/api/compare_models')
-      .then(response => {
-        setMetrics(response.data);
-      })
-      .catch(error => {
-        console.error("There was an error fetching the data!", error);
-      });
-  }, []);
+    const fetchData = async () => {
+      const data = await fetchModelComparison();
+      console.log("📊 Setting models state:", data);
+      setMetrics(data);
+    };
+
+    fetchData();
+  }, [])
 
   return (
     <div className="container">
@@ -31,10 +31,11 @@ const ModelComparison = () => {
         <tbody>
           {metrics.map((model, index) => (
             <tr key={index}>
-              <td>{model.model}</td>
-              <td>{model.rmse.toFixed(4)}</td>
-              <td>{model.mae.toFixed(4)}</td>
-              <td>{model.r2.toFixed(4)}</td>
+              <td>{model.Model}</td>
+              <td>{model.RMSE ? model.RMSE.toFixed(4) : "N/A"}</td>
+              <td>{model.MAE ? model.MAE.toFixed(4) : "N/A"}</td>
+              <td>{model["R² Score"] ? model["R² Score"].toFixed(4) : "N/A"}</td>
+
             </tr>
           ))}
         </tbody>
