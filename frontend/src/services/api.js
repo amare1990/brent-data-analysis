@@ -1,28 +1,21 @@
-import axios from "axios";
+const BASE_URL = "http://localhost:5000";
 
-// Set Flask backend URL
-// const BASE_URL = "http://127.0.0.1:5000";
-const BASE_URL = "http://localhost:5000";  1
-
-
-// Function to fetch Brent oil data
-export const fetchOilData = async () => {
+export async function fetchOilData() {
     try {
-        const response = await axios.get(`${BASE_URL}/api/data`);
-        return response.data;
+        const response = await fetch(`${BASE_URL}/api/data`);
+        return await response.json();
     } catch (error) {
-        console.error("Error fetching Brent oil data:", error);
+        console.error("Error fetching oil data:", error);
         return null;
     }
-};
+}
 
-// Function to fetch ARIMA results
-export const fetchArimaResults = async () => {
+export async function fetchArimaSummary() {
     try {
-        const response = await axios.get(`${BASE_URL}/api/arima`);
-        return response.data;
+        const response = await fetch(`${BASE_URL}/api/arima`);
+        return await response.json();
     } catch (error) {
-        console.error("Error fetching ARIMA results:", error);
+        console.error("Error fetching ARIMA summary:", error);
         return null;
     }
-};
+}
