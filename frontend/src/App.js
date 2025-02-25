@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import OilData from "./components/OilData";
+import ArimaResults from "./components/ArimaResults";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <Router>
+            <div>
+                <nav>
+                    <ul>
+                        <li><Link to="/">Brent Oil Data</Link></li>
+                        <li><Link to="/arima">ARIMA Summary</Link></li>
+                    </ul>
+                </nav>
+
+                <Routes>
+                    <Route path="/" element={<OilData />} />
+                    <Route path="/arima" element={<ArimaResults />} />
+                </Routes>
+            </div>
+        </Router>
+    );
 }
 
 export default App;
