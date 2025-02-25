@@ -25,13 +25,13 @@ class BrentDataAnalysis:
             self.file_path,
             parse_dates=["Date"],
             index_col="Date")
-        print(f"\n{'*'*70}")
+        print(f"\n{'*'*100}")
         print("Data loaded successfully!")
         return self.data
 
     def overview_of_data(self):
         """Provide an overview of the dataset."""
-        print(f"\n{'*'*70}")
+        print(f"\n{'*'*100}")
         print("Overview of the Data:")
         print(f"Number of Rows: {self.data.shape[0]}")
         print(f"Number of Columns: {self.data.shape[1]}")
@@ -42,7 +42,7 @@ class BrentDataAnalysis:
 
     def describe_data(self):
         """Provide basic summary statistics"""
-        print(f"\n{'*'*70}")
+        print(f"\n{'*'*100}")
         print(
             f"Basic statistical summary for numerical columns\n {self.data.describe()}")
         if self.data.dtypes[self.data.dtypes == "object"].any():
@@ -53,7 +53,7 @@ class BrentDataAnalysis:
 
     def identify_missing_values(self):
         """Identify missing values in the dataset."""
-        print(f"\n{'*'*70}")
+        print(f"\n{'*'*100}")
         print("Missing Values:")
         missing_values = self.data.isnull().sum()
         print(missing_values[missing_values > 0])
@@ -64,7 +64,7 @@ class BrentDataAnalysis:
         rows_before = self.data.shape[0]
         self.data.drop_duplicates(inplace=True)
         rows_after = self.data.shape[0]
-        print(f"\n{'*'*70}")
+        print(f"\n{'*'*100}")
         print("Duplicates removed.")
         print(
             f"Number of rows removed for the duplicate rows case: {rows_before - rows_after}")
@@ -72,14 +72,21 @@ class BrentDataAnalysis:
             f"Total rows left after duplicate rows removed. \n {self.data.shape[0]}")
         print("\n")
 
+    def sort_data(self):
+        """Sort data in ascending order by data index, in this case by Date."""
+        print(f"\n{'*'*100}")
+        self.data.sort_index(inplace=True)
+        print("Data sorted by Date index.")
+
     def save_processed_data(self, save_path):
         """Saving processed data."""
+        print(f"\n{'*'*100}")
         self.data.to_csv(save_path)
         print(f"Processed data saved successfully as {save_path}")
 
     def plot_time_series(self):
         """Plot time series data."""
-        print(f"\n{'*'*70}\n")
+        print(f"\n{'*'*100}\n")
         plt.figure(figsize=(12, 6))
         sns.lineplot(data=self.data, x=self.data.index, y='Price')
         plt.title('Brent Oil Price Time Series')
