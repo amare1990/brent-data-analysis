@@ -101,8 +101,8 @@ class StatisticalModel:
             bbox_inches="tight"
         )
         plt.show()
-        plt.show()
         print(self.arima_result.summary())
+        return self.arima_result.summary()
 
     def fit_garch(self):
         """Fit a GARCH model"""
