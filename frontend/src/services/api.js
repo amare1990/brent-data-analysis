@@ -36,3 +36,15 @@ export const fetchArimaResults = async () => {
         return null;
     }
 };
+
+
+// Fetch Model comparison Performance Metrics
+export const fetchModelComparison = async () => {
+  try {
+    const response = await axios.get('compare_models');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching model comparison data:", error);
+    throw error;
+  }
+};
