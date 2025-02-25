@@ -10,7 +10,11 @@ sys.path.append(BASE_DIR)
 from scripts.data_analysis import BrentDataAnalysis
 from scripts.statistical_modeling import StatisticalModel
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)  # Allow frontend requests
+
 
 # Load & preprocess data
 workflow = BrentDataAnalysis("../data/BrentOilPrices.csv")
