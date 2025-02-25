@@ -51,6 +51,8 @@ class BrentDataAnalysis:
         else:
             print("No categorical or object columns found.")
 
+        return self.data.describe()
+
     def identify_missing_values(self):
         """Identify missing values in the dataset."""
         print(f"\n{'*'*100}")

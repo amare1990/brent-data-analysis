@@ -6,9 +6,6 @@ import pandas_datareader.data as web
 import matplotlib.pyplot as plt
 
 from statsmodels.tsa.api import VAR
-# from statsmodels.tsa.regime_switching import MarkovRegression # This is
-# likely causing the error
-# Import MarkovAutoregression instead
 from statsmodels.tsa.regime_switching.markov_autoregression import MarkovAutoregression
 
 from sklearn.preprocessing import StandardScaler

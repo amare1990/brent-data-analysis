@@ -1,0 +1,44 @@
+/* Overview.css */
+.overview-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  text-align: center;
+}
+
+.overview-section {
+  margin-bottom: 20px;
+}
+
+.overview-section h3 {
+  color: #333;
+}
+
+.overview-content {
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.overview-content p {
+  margin: 5px 0;
+}
+
+.summary-box {
+  white-space: pre-wrap; /* Preserves the formatting of the summary */
+  background-color: #f4f4f4;
+  padding: 15px;
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
