@@ -1,7 +1,9 @@
 import axios from "axios";
 
 // Set Flask backend URL
-const BASE_URL = "http://127.0.0.1:5000";
+// const BASE_URL = "http://127.0.0.1:5000";
+const BASE_URL = "http://localhost:5000";  1
+
 
 // Function to fetch Brent oil data
 export const fetchOilData = async () => {
