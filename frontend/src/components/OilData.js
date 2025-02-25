@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { fetchOilData, fetchArimaSummary } from "../services/api";
+import { fetchOilData, fetchArimaResults } from "../services/api";
 import "./OilData.css"; // Import CSS
 
 const OilData = () => {
     const [oilData, setOilData] = useState(null);
-    const [arimaSummary, setArimaSummary] = useState("");
     const [error, setError] = useState(null);
 
     useEffect(() => {
         async function getData() {
             try {
                 const data = await fetchOilData();
-                const arima = await fetchArimaSummary();
                 if (data) setOilData(data);
-                if (arima) setArimaSummary(arima.arima_summary);
             } catch (err) {
                 console.error("API Error:", err);
                 setError("Error fetching data.");
@@ -33,15 +30,6 @@ const OilData = () => {
                     <pre className="json-box">{JSON.stringify(oilData, null, 2)}</pre>
                 ) : (
                     <p>Loading data...</p>
-                )}
-            </div>
-
-            <div className="section">
-                <h3>📊 ARIMA Summary</h3>
-                {arimaSummary ? (
-                    <pre className="summary-box">{arimaSummary}</pre>
-                ) : (
-                    <p>Loading ARIMA summary...</p>
                 )}
             </div>
         </div>
