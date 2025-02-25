@@ -73,7 +73,10 @@ class StatisticalModel:
         # Forecast
         arima_preds = self.arima_result.forecast(steps=len(self.test))
         # Compute Metrics
-        arima_rmse = np.sqrt(mean_squared_error(self.test['Price'], arima_preds))
+        arima_rmse = np.sqrt(
+            mean_squared_error(
+                self.test['Price'],
+                arima_preds))
         arima_mae = mean_absolute_error(self.test['Price'], arima_preds)
         arima_r2 = r2_score(self.test['Price'], arima_preds)
 
@@ -85,7 +88,11 @@ class StatisticalModel:
         # Plot
         plt.figure(figsize=(10, 5))
         plt.plot(self.test.index, self.test['Price'], label="Actual Price")
-        plt.plot(self.test.index, arima_preds, linestyle="dashed", label="Predicted Price")
+        plt.plot(
+            self.test.index,
+            arima_preds,
+            linestyle="dashed",
+            label="Predicted Price")
         plt.legend()
         plt.title("ARIMA Predictions vs Actual")
         plt.savefig(
@@ -101,14 +108,20 @@ class StatisticalModel:
         """Fit a GARCH model"""
         print(f"\n{'*'*100}\n")
         print("Fitting GARCH model.\n")
-        garch = arch_model(self.train['Price'].pct_change().dropna(), vol='Garch', p=1, q=1)
+        garch = arch_model(
+            self.train['Price'].pct_change().dropna(),
+            vol='Garch',
+            p=1,
+            q=1)
         self.garch_result = garch.fit()
 
         # Forecast volatility
         # Adjust start and horizon to ensure they are within the data range
-        horizon = min(len(self.test), len(self.train))  # Limit horizon to training data size
+        # Limit horizon to training data size
+        horizon = min(len(self.test), len(self.train))
         start = len(self.train) - horizon
-        garch_forecast = self.garch_result.forecast(start=start, horizon=horizon)
+        garch_forecast = self.garch_result.forecast(
+            start=start, horizon=horizon)
 
         volatility_preds = garch_forecast.variance.values[-1, :]
         garch_preds = volatility_preds
@@ -122,8 +135,10 @@ class StatisticalModel:
         # Ensure both actual_volatility and garch_preds have the same length
         actual_volatility = actual_volatility.dropna()
         min_len = min(len(actual_volatility), len(garch_preds))
-        garch_rmse = np.sqrt(mean_squared_error(actual_volatility[:min_len], garch_preds[:min_len]))
-        garch_mae = mean_absolute_error(actual_volatility[:min_len], garch_preds[:min_len])
+        garch_rmse = np.sqrt(mean_squared_error(
+            actual_volatility[:min_len], garch_preds[:min_len]))
+        garch_mae = mean_absolute_error(
+            actual_volatility[:min_len], garch_preds[:min_len])
         garch_r2 = r2_score(actual_volatility[:min_len], garch_preds[:min_len])
 
         print(f"\n📊 GARCH Performance:")
@@ -134,8 +149,13 @@ class StatisticalModel:
         # Plot
         # Ensure plotting range matches the forecasted data
         plt.figure(figsize=(10, 5))
-        plt.plot(self.test.index[:min_len], actual_volatility[:min_len], label="Actual Volatility")
-        plt.plot(self.test.index[:min_len], volatility_preds[:min_len], linestyle="dashed", label="Predicted Volatility")
+        plt.plot(self.test.index[:min_len],
+                 actual_volatility[:min_len],
+                 label="Actual Volatility")
+        plt.plot(self.test.index[:min_len],
+                 volatility_preds[:min_len],
+                 linestyle="dashed",
+                 label="Predicted Volatility")
         plt.legend()
         plt.title("GARCH Volatility Prediction")
         plt.savefig(
@@ -159,23 +179,30 @@ class StatisticalModel:
             trace = pm.sample(1000, return_inferencedata=True)
 
         # Extract posterior mean from Bayesian inference
-        posterior_mean = trace.posterior["mu"].mean(dim=("chain", "draw")).values
+        posterior_mean = trace.posterior["mu"].mean(
+            dim=("chain", "draw")).values
 
         # Compute Metrics
-        bayesian_rmse = np.sqrt(mean_squared_error(self.test['Price'], [posterior_mean] * len(self.test)))
-        bayesian_mae = mean_absolute_error(self.test['Price'], [posterior_mean] * len(self.test))
-        bayesian_r2 = r2_score(self.test['Price'], [posterior_mean] * len(self.test))
+        bayesian_rmse = np.sqrt(mean_squared_error(
+            self.test['Price'], [posterior_mean] * len(self.test)))
+        bayesian_mae = mean_absolute_error(
+            self.test['Price'], [posterior_mean] * len(self.test))
+        bayesian_r2 = r2_score(self.test['Price'], [
+                               posterior_mean] * len(self.test))
 
         print(f"\n📊 Bayesian Inference Performance:")
         print(f"✅ RMSE: {bayesian_rmse}")
         print(f"✅ MAE: {bayesian_mae}")
         print(f"✅ R² Score: {bayesian_r2}")
 
-
         # Plot
         plt.figure(figsize=(10, 5))
         plt.plot(self.test.index, self.test['Price'], label="Actual Price")
-        plt.axhline(posterior_mean, color='r', linestyle="dashed", label="Bayesian Mean Prediction")
+        plt.axhline(
+            posterior_mean,
+            color='r',
+            linestyle="dashed",
+            label="Bayesian Mean Prediction")
         plt.legend()
         plt.title("Bayesian Inference Prediction")
         plt.savefig(
@@ -205,7 +232,6 @@ class StatisticalModel:
         print(trace.observed_data)
 
         return trace
-
 
     # def fit_var(self, lags=5):
     #     """Fit a Vector Autoregressive (VAR) model with predictions and performance metrics."""
@@ -241,8 +267,6 @@ class StatisticalModel:
 
     #     print(var_result.summary())
     #     return var_result
-
-
 
     # def fit_markov_switching_arima(self, order=(1, 1, 1), n_regimes=2):
     #     """Fit a Markov-Switching ARIMA model with predictions and performance metrics."""
@@ -284,12 +308,16 @@ class StatisticalModel:
         # print("Fitting LSTM model.\n")
 
         # Initialize the LSTMTimeSeries with the data, epochs, and batch size
-        lstm_model = LSTMTimeSeries(data=self.data, epochs=epochs, batch_size=batch_size)
+        lstm_model = LSTMTimeSeries(
+            data=self.data,
+            epochs=epochs,
+            batch_size=batch_size)
 
         # Fit the model
         model, perf_metrics = lstm_model.fit()
 
-        # Optionally, return the trained model if you need it for further predictions or analysis
+        # Optionally, return the trained model if you need it for further
+        # predictions or analysis
         return model, perf_metrics
 
     def compare_models(self):
@@ -300,29 +328,40 @@ class StatisticalModel:
 
         # --------------------- ARIMA Model Evaluation ---------------------
         arima_preds = self.arima_result.forecast(steps=len(self.test))
-        arima_rmse = np.sqrt(mean_squared_error(self.test['Price'], arima_preds))
+        arima_rmse = np.sqrt(
+            mean_squared_error(
+                self.test['Price'],
+                arima_preds))
         arima_mae = mean_absolute_error(self.test['Price'], arima_preds)
         arima_r2 = r2_score(self.test['Price'], arima_preds)
 
-        # --------------------- Bayesian Inference Evaluation ---------------------
+        # --------------------- Bayesian Inference Evaluation -----------------
         bayes_preds = [self.train['Price'].mean()] * len(self.test)
-        bayesian_rmse = np.sqrt(mean_squared_error(self.test['Price'], bayes_preds))
+        bayesian_rmse = np.sqrt(
+            mean_squared_error(
+                self.test['Price'],
+                bayes_preds))
         bayesian_mae = mean_absolute_error(self.test['Price'], bayes_preds)
         bayesian_r2 = r2_score(self.test['Price'], bayes_preds)
 
         # --------------------- GARCH Model Evaluation ---------------------
-        actual_volatility = self.test['Price'].pct_change() ** 2  # Squared returns
+        # Squared returns
+        actual_volatility = self.test['Price'].pct_change() ** 2
         garch_forecast = self.garch_result.forecast(
             start=len(self.train) - len(self.test),
             horizon=len(self.test)
         )
-        garch_preds = garch_forecast.variance.values[-1, :]  # Predicted volatility
+        # Predicted volatility
+        garch_preds = garch_forecast.variance.values[-1, :]
 
         min_len = min(len(actual_volatility.dropna()), len(garch_preds))
         actual_volatility = actual_volatility.dropna()[:min_len]
         garch_preds = garch_preds[:min_len]
 
-        garch_rmse = np.sqrt(mean_squared_error(actual_volatility, garch_preds))
+        garch_rmse = np.sqrt(
+            mean_squared_error(
+                actual_volatility,
+                garch_preds))
         garch_mae = mean_absolute_error(actual_volatility, garch_preds)
         garch_r2 = r2_score(actual_volatility, garch_preds)
 
@@ -337,8 +376,6 @@ class StatisticalModel:
         print(f"RMSE: {perf_metrics['rmse']}")
         print(f"MAE: {perf_metrics['mae']}")
         print(f"R² Score: {perf_metrics['r2']}")
-
-
 
         # print(f"📊 LSTM Performance:")
         # print(f"✅ RMSE: {rmse}")
@@ -359,9 +396,6 @@ class StatisticalModel:
         print("✅ Model with lowest RMSE and MAE is generally the best.")
         print("✅ Higher R² Score (closer to 1) indicates better model fit.\n")
 
-
-
-
     # def compare_models(self):
     #     """Compare model performance using RMSE, MAE, and R² Score."""
 
@@ -374,21 +408,23 @@ class StatisticalModel:
     #     arima_mae = mean_absolute_error(self.test['Price'], arima_preds)
     #     arima_r2 = r2_score(self.test['Price'], arima_preds)
 
-    #     # --------------------- Bayesian Inference Evaluation ---------------------
+    #     # --------------------- Bayesian Inference Evaluation --------------
     #     bayes_preds = [self.train['Price'].mean()] * len(self.test)
     #     bayesian_rmse = np.sqrt(mean_squared_error(self.test['Price'], bayes_preds))
     #     bayesian_mae = mean_absolute_error(self.test['Price'], bayes_preds)
     #     bayesian_r2 = r2_score(self.test['Price'], bayes_preds)
 
     #     # --------------------- GARCH Model Evaluation ---------------------
-    #     actual_volatility = self.test['Price'].pct_change() ** 2  # Squared returns
+    # actual_volatility = self.test['Price'].pct_change() ** 2  # Squared
+    # returns
 
     #     # Fix: Adjust start to be within the training data range, and align the lengths of arrays
     #     garch_forecast = self.garch_result.forecast(
     #         start=len(self.train) - len(self.test) + 1,  # Adjusted start to match the length of actual_volatility
     #         horizon=len(self.test) -1 # Adjusted horizon to match the length of actual_volatility
     #     )
-    #     garch_preds = garch_forecast.variance.values[-1, :]  # Predicted volatility
+    # garch_preds = garch_forecast.variance.values[-1, :]  # Predicted
+    # volatility
 
     #     # Ensure both arrays have the same length
     #     min_len = min(len(actual_volatility.dropna()), len(garch_preds))
@@ -406,20 +442,21 @@ class StatisticalModel:
     #     # var_mae = mean_absolute_error(self.test['Price'], var_preds)
     #     # var_r2 = r2_score(self.test['Price'], var_preds)
 
-    #     # --------------------- Markov-Switching ARIMA Model Evaluation ---------------------
+    #     # --------------------- Markov-Switching ARIMA Model Evaluation ----
     #     # Assuming fit_markov_switching_arima returns the predicted values for the test set
     #     # msarima_preds = self.fit_markov_switching_arima()  # Adjust based on your implementation
     #     # msarima_rmse = np.sqrt(mean_squared_error(self.test['Price'], msarima_preds))
     #     # msarima_mae = mean_absolute_error(self.test['Price'], msarima_preds)
     #     # msarima_r2 = r2_score(self.test['Price'], msarima_preds)
 
-
     #     # --------------------- LSTM Model Evaluation ---------------------
     #     lstm_model = LSTMModel(data=self.data)  # Initialize LSTM model
-    #     trained_lstm_model = lstm_model.fit_lstm(epochs=25, batch_size=32)  # Train LSTM model
+    # trained_lstm_model = lstm_model.fit_lstm(epochs=25, batch_size=32)  #
+    # Train LSTM model
 
     #     # Get LSTM predictions from the trained model
-    #     lstm_preds = trained_lstm_model.predict(self.test_data)  # Adjust with actual method to get predictions
+    # lstm_preds = trained_lstm_model.predict(self.test_data)  # Adjust with
+    # actual method to get predictions
 
     #     # Rescale predictions back to original values
     #     scaler = MinMaxScaler(feature_range=(-1, 1))

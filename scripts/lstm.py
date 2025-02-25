@@ -13,7 +13,11 @@ base_dir = "/home/am/Documents/Software Development/10_Academy Training/week-10/
 class LSTMModel(nn.Module):
     def __init__(self, input_size=1, hidden_layer_size=64, num_layers=2):
         super(LSTMModel, self).__init__()
-        self.lstm = nn.LSTM(input_size, hidden_layer_size, num_layers, batch_first=True)
+        self.lstm = nn.LSTM(
+            input_size,
+            hidden_layer_size,
+            num_layers,
+            batch_first=True)
         self.fc = nn.Linear(hidden_layer_size, 1)
 
     def forward(self, x):
@@ -32,7 +36,8 @@ class LSTMTimeSeries:
         self.criterion = nn.MSELoss()
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
 
-    def preprocess_data(self, data, is_training=True): # Add data argument with default to None
+    # Add data argument with default to None
+    def preprocess_data(self, data, is_training=True):
         """Preprocess data by normalizing and creating sequences."""
         if is_training:  # Only fit_transform during training
             scaled_data = self.scaler.fit_transform(data[['Price']].values)
@@ -50,12 +55,14 @@ class LSTMTimeSeries:
         X, y = create_sequences(scaled_data, self.seq_length)
         return X, y
 
-
     def train_model(self, X_train, y_train):
         """Train the LSTM model."""
         train_data = TensorDataset(torch.tensor(X_train, dtype=torch.float32),
                                    torch.tensor(y_train, dtype=torch.float32))
-        train_loader = DataLoader(train_data, batch_size=self.batch_size, shuffle=True)
+        train_loader = DataLoader(
+            train_data,
+            batch_size=self.batch_size,
+            shuffle=True)
 
         train_losses = []
         for epoch in range(self.epochs):
@@ -79,7 +86,10 @@ class LSTMTimeSeries:
         """Evaluate the LSTM model on the test set."""
         test_data = TensorDataset(torch.tensor(X_test, dtype=torch.float32),
                                   torch.tensor(y_test, dtype=torch.float32))
-        test_loader = DataLoader(test_data, batch_size=self.batch_size, shuffle=False)
+        test_loader = DataLoader(
+            test_data,
+            batch_size=self.batch_size,
+            shuffle=False)
 
         predictions = []
         self.model.eval()
@@ -99,17 +109,27 @@ class LSTMTimeSeries:
         plt.ylabel('Loss')
         plt.title('LSTM Training Loss')
         plt.legend()
-        plt.savefig(f"{base_dir}/notebooks/plots/lstm_training_loss.png", dpi=300, bbox_inches="tight")
+        plt.savefig(
+            f"{base_dir}/notebooks/plots/lstm_training_loss.png",
+            dpi=300,
+            bbox_inches="tight")
         plt.show()
 
     def plot_predictions(self, actual, predicted):
         """Plot predictions vs actual values."""
         plt.figure(figsize=(10, 5))
         plt.plot(actual.index, actual['Price'], label="Actual Price")
-        plt.plot(actual.index, predicted, linestyle="dashed", label="Predicted Price (LSTM)")
+        plt.plot(
+            actual.index,
+            predicted,
+            linestyle="dashed",
+            label="Predicted Price (LSTM)")
         plt.legend()
         plt.title("LSTM Predictions vs Actual")
-        plt.savefig(f"{base_dir}/notebooks/plots/lstm_prediction.png", dpi=300, bbox_inches="tight")
+        plt.savefig(
+            f"{base_dir}/notebooks/plots/lstm_prediction.png",
+            dpi=300,
+            bbox_inches="tight")
         plt.show()
 
     def calculate_metrics(self, actual, predicted):
